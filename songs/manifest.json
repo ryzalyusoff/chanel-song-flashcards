@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "decks": [
+    {
+      "id": "cinta-dalam-hati",
+      "title": "Cinta Dalam Hati (Word Deck)",
+      "type": "word",
+      "file": "cinta-dalam-hati.json"
+    }
+  ]
+}
