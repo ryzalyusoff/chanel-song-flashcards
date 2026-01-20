@@ -6,6 +6,12 @@
       "title": "Cinta Dalam Hati (Word Deck)",
       "type": "word",
       "file": "cinta-dalam-hati.json"
-    }
+    },
+    {
+	  "id": "terima-kasih-iamneeta",
+	  "title": "Terima Kasih – iamneeta (Line Deck)",
+	  "type": "word",
+	  "file": "terima-kasih-iamneeta.json"
+	}
   ]
 }
