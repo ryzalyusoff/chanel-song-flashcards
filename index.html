@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lyrics Flashcards (Option 1 - songs folder)</title>
+  <style>
+    :root{
+      --bg: #fff6fb;
+      --card: #ffffff;
+      --text: #3a2a33;
+      --muted: #7b5d6b;
+      --border: #f0cfe0;
+      --shadow: 0 18px 40px rgba(220, 150, 180, .35);
+      --radius: 20px;
+      --accentStrong: #ee8fb9;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 800px at 15% 15%, #ffe3f1 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, #ffd6eb 0%, transparent 55%),
+        radial-gradient(1000px 800px at 50% 90%, #fff0f7 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+    }
+    .wrap{ width:min(1040px, 100%); }
+    header{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    h1{
+      font-size: clamp(20px, 2.4vw, 30px);
+      margin:0 0 6px 0;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height:1.35;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:10px 12px;
+      color: var(--muted);
+      font-size:13px;
+      user-select:none;
+      background: #fff;
+      white-space:nowrap;
+    }
+
+    .topbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin: 10px 0 14px;
+    }
+
+    select{
+      border:1px solid var(--border);
+      background:#fff;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 14px;
+      outline:none;
+    }
+
+    .search{
+      flex: 1 1 240px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 14px;
+      background: #fff;
+      min-width: 220px;
+    }
+    .search input{
+      flex:1;
+      border:none;
+      outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .search input::placeholder{ color: #b38aa0; }
+
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: #fff;
+      user-select:none;
+      color: var(--muted);
+      font-size: 13px;
+      white-space:nowrap;
+    }
+    input[type="checkbox"]{ width:18px;height:18px; accent-color: var(--accentStrong); }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    button{
+      appearance:none;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 700;
+      font-size: 14px;
+      user-select:none;
+      transition: transform .05s ease, background .2s ease, box-shadow .2s ease;
+    }
+    button:hover{
+      background: #fff0f7;
+      box-shadow: 0 6px 18px rgba(238, 143, 185, .35);
+    }
+    button:active{ transform: translateY(1px); }
+    button.primary{
+      background: linear-gradient(180deg, #fbd2e5, #f6b6d2);
+      border-color: #f3a8c9;
+      color: #5a2f43;
+    }
+    button.primary:hover{
+      background: linear-gradient(180deg, #f8c4dd, #ee8fb9);
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: 0 18px 40px rgba(220, 150, 180, .35);
+      overflow:hidden;
+    }
+    .card-inner{
+      padding: 26px 24px 20px;
+      min-height: 260px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap: 14px;
+      outline:none;
+      cursor:pointer;
+    }
+    .front, .back{ display:none; text-align:center; padding: 6px 10px; }
+    .front.active, .back.active{ display:block; }
+
+    .malay{
+      font-size: clamp(34px, 4.2vw, 56px);
+      font-weight: 800;
+      letter-spacing:.3px;
+      color: #3a2a33;
+    }
+    .english{
+      font-size: clamp(22px, 2.6vw, 34px);
+      font-weight: 650;
+      color: #5a3d4a;
+    }
+    .notes{
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height:1.45;
+    }
+    .hint{
+      margin-top: 12px;
+      font-size: 13px;
+      color: #b38aa0;
+    }
+    .divider{ height:1px; background: var(--border); }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 14px;
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+    .left, .right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .footer{
+      margin-top: 12px;
+      color: #a97a92;
+      font-size: 12px;
+      text-align:center;
+    }
+    kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: #7b5d6b;
+    }
+
+    .error{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #f3a8c9;
+      border-radius: 14px;
+      background: #fff;
+      color: #7b1f4f;
+      display:none;
+    }
+    .meta{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    code{
+      background:#fff;
+      padding: 1px 6px;
+      border:1px solid var(--border);
+      border-radius: 8px;
+      color: #6a2a49;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Lyrics Flashcards</h1>
+        <p class="subtitle">Option 1: Put song JSON files in <code>songs/</code> and list them in <code>songs/manifest.json</code>.</p>
+        <div class="meta" id="deckMeta"></div>
+      </div>
+      <div class="pill" id="progressPill">0 / 0</div>
+    </header>
+
+    <div class="topbar">
+      <select id="deckSelect" aria-label="Choose deck"></select>
+
+      <div class="search">
+        <span style="opacity:.7">Search</span>
+        <input id="searchInput" type="text" placeholder="bahagia, maybe, goodbye…" />
+      </div>
+
+      <label class="toggle">
+        <input type="checkbox" id="notesToggle" checked />
+        <span>Show notes</span>
+      </label>
+
+      <span class="chip" id="deckCountChip">0 cards</span>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+
+    <section class="card">
+      <div class="card-inner" id="cardInner" tabindex="0">
+        <div class="front active" id="front">
+          <div class="malay" id="malayText">Loading…</div>
+          <div class="hint">Tap to reveal English</div>
+        </div>
+        <div class="back" id="back">
+          <div class="english" id="englishText">—</div>
+          <div class="notes" id="notesText"></div>
+          <div class="hint">Tap to go back</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="controls">
+        <div class="left">
+          <button id="prevBtn">← Prev</button>
+          <button class="primary" id="flipBtn">Flip</button>
+          <button id="nextBtn">Next →</button>
+        </div>
+        <div class="right">
+          <button id="shuffleBtn">Shuffle</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Space = flip · ← → = navigate · S = shuffle · R = reset · / = focus search · Esc = exit search
+    </div>
+  </div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+const el = {
+  deckSelect: $("deckSelect"),
+  deckMeta: $("deckMeta"),
+  search: $("searchInput"),
+  toggle: $("notesToggle"),
+  count: $("deckCountChip"),
+  pill: $("progressPill"),
+  error: $("errorBox"),
+  card: $("cardInner"),
+  front: $("front"),
+  back: $("back"),
+  malay: $("malayText"),
+  eng: $("englishText"),
+  notes: $("notesText"),
+  prev: $("prevBtn"),
+  next: $("nextBtn"),
+  flip: $("flipBtn"),
+  shuffle: $("shuffleBtn"),
+  reset: $("resetBtn")
+};
+
+let manifest = null;
+let deck = [];
+let filtered = [];
+let idx = 0;
+let flipped = false;
+let currentDeckId = null;
+let currentDeckTitle = "";
+
+function showError(msg){
+  el.error.style.display = "block";
+  el.error.textContent = msg;
+}
+function clearError(){
+  el.error.style.display = "none";
+  el.error.textContent = "";
+}
+
+function setFlipped(v){
+  flipped = v;
+  el.front.classList.toggle("active", !v);
+  el.back.classList.toggle("active", v);
+}
+
+function render(){
+  el.count.textContent = filtered.length + " cards";
+
+  if(filtered.length === 0){
+    el.malay.textContent = "No results";
+    el.eng.textContent = "Try a different search";
+    el.notes.textContent = "";
+    el.pill.textContent = "0 / 0";
+    setFlipped(false);
+    return;
+  }
+
+  if(idx < 0) idx = 0;
+  if(idx >= filtered.length) idx = filtered.length - 1;
+
+  const c = filtered[idx];
+  el.malay.textContent = c.malay ?? "";
+  el.eng.textContent = c.english ?? "";
+  el.notes.textContent = el.toggle.checked ? (c.notes || "") : "";
+  el.pill.textContent = (idx + 1) + " / " + filtered.length;
+
+  setFlipped(false);
+}
+
+function applySearch(){
+  const q = (el.search.value || "").toLowerCase().trim();
+  if(!q){
+    filtered = deck.map(x => ({...x}));
+  } else {
+    filtered = deck.filter(x => {
+      const m = (x.malay || "").toLowerCase();
+      const e = (x.english || "").toLowerCase();
+      const n = (x.notes || "").toLowerCase();
+      return m.includes(q) || e.includes(q) || n.includes(q);
+    }).map(x => ({...x}));
+  }
+  idx = 0;
+  render();
+}
+
+function shuffleCards(){
+  for(let i = filtered.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
+  idx = 0;
+  render();
+}
+
+function resetDeckView(){
+  el.search.value = "";
+  filtered = deck.map(x => ({...x}));
+  idx = 0;
+  render();
+}
+
+function flipCard(){ setFlipped(!flipped); }
+function nextCard(){ if(filtered.length){ idx = (idx + 1) % filtered.length; render(); } }
+function prevCard(){ if(filtered.length){ idx = (idx - 1 + filtered.length) % filtered.length; render(); } }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function updateMeta(){
+  const entry = manifest?.decks?.find(d => d.id === currentDeckId);
+  const mode = entry?.type || "word";
+  el.deckMeta.innerHTML = "";
+  const bits = [
+    "<strong>Deck:</strong> " + escapeHtml(currentDeckTitle),
+    "<strong>Type:</strong> " + escapeHtml(mode),
+    "<strong>File:</strong> songs/" + escapeHtml(entry?.file || "")
+  ];
+  el.deckMeta.insertAdjacentHTML("beforeend", bits.map(b => "<span>" + b + "</span>").join(" · "));
+}
+
+async function loadManifest(){
+  clearError();
+  const res = await fetch("songs/manifest.json", {cache: "no-store"});
+  if(!res.ok) throw new Error("Failed to load songs/manifest.json (" + res.status + ")");
+  const data = await res.json();
+  if(!data || !Array.isArray(data.decks)) throw new Error("manifest.json is missing 'decks' array");
+  manifest = data;
+  return manifest;
+}
+
+function populateDeckSelect(){
+  el.deckSelect.innerHTML = "";
+  manifest.decks.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d.id;
+    opt.textContent = d.title;
+    el.deckSelect.appendChild(opt);
+  });
+
+  const saved = localStorage.getItem("lyricsFlashcards:lastDeckId");
+  const first = manifest.decks[0]?.id;
+  currentDeckId = (saved && manifest.decks.some(d => d.id === saved)) ? saved : first;
+  el.deckSelect.value = currentDeckId;
+}
+
+async function loadDeckById(deckId){
+  clearError();
+  const entry = manifest.decks.find(x => x.id === deckId);
+  if(!entry) throw new Error("Deck not found in manifest: " + deckId);
+
+  const res = await fetch("songs/" + entry.file, {cache: "no-store"});
+  if(!res.ok) throw new Error("Failed to load songs/" + entry.file + " (" + res.status + ")");
+  const data = await res.json();
+  if(!data || !Array.isArray(data.cards)) throw new Error("Deck file is missing 'cards' array: " + entry.file);
+
+  currentDeckId = entry.id;
+  currentDeckTitle = entry.title;
+
+  deck = data.cards.map(c => ({
+    malay: c.malay ?? "",
+    english: c.english ?? "",
+    notes: c.notes ?? ""
+  }));
+
+  localStorage.setItem("lyricsFlashcards:lastDeckId", currentDeckId);
+  updateMeta();
+  resetDeckView();
+}
+
+/* UI events */
+el.deckSelect.addEventListener("change", () => loadDeckById(el.deckSelect.value).catch(e => showError(e.message)));
+el.search.addEventListener("input", applySearch);
+el.toggle.addEventListener("change", render);
+
+el.card.addEventListener("click", flipCard);
+el.flip.addEventListener("click", flipCard);
+el.next.addEventListener("click", nextCard);
+el.prev.addEventListener("click", prevCard);
+el.shuffle.addEventListener("click", shuffleCards);
+el.reset.addEventListener("click", resetDeckView);
+
+/* Keyboard */
+window.addEventListener("keydown", (e) => {
+  const active = document.activeElement;
+  const typing = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable);
+
+  if(typing){
+    if(e.key === "Escape"){
+      e.preventDefault();
+      active.blur();
+    }
+    return;
+  }
+
+  if(e.key === " " || e.key === "Spacebar"){
+    e.preventDefault();
+    flipCard();
+    return;
+  }
+  if(e.key === "ArrowRight"){ e.preventDefault(); nextCard(); return; }
+  if(e.key === "ArrowLeft"){ e.preventDefault(); prevCard(); return; }
+
+  const k = (e.key || "").toLowerCase();
+  if(k === "s"){ e.preventDefault(); shuffleCards(); return; }
+  if(k === "r"){ e.preventDefault(); resetDeckView(); return; }
+  if(k === "/"){ e.preventDefault(); el.search.focus(); return; }
+});
+
+(async function init(){
+  try{
+    await loadManifest();
+    populateDeckSelect();
+    await loadDeckById(currentDeckId);
+  } catch(err){
+    showError("Open this via a local server (not file://). Error: " + err.message);
+  }
+})();
+</script>
+</body>
+</html>
