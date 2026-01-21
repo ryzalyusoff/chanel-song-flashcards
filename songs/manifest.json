@@ -3,13 +3,13 @@
   "decks": [
     {
       "id": "cinta-dalam-hati",
-      "title": "Cinta Dalam Hati (Word Deck)",
+      "title": "Cinta Dalam Hati",
       "type": "word",
       "file": "cinta-dalam-hati.json"
     },
     {
 	  "id": "terima-kasih-iamneeta",
-	  "title": "Terima Kasih – iamneeta (Line Deck)",
+	  "title": "Terima Kasih – iamneeta",
 	  "type": "word",
 	  "file": "terima-kasih-iamneeta.json"
 	}
